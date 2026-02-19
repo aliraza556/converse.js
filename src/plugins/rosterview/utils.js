@@ -375,7 +375,6 @@ export function clearXMPPProvidersCache() {
  * @returns {Promise<string[]>}
  */
 export async function fetchXMPPProviders() {
-    // Return cached providers if available
     if (xmpp_providers_cache !== null) {
         return xmpp_providers_cache;
     }
@@ -385,7 +384,7 @@ export async function fetchXMPPProviders() {
         return xmpp_providers_fetch_promise;
     }
 
-    const providers_url = api.settings.get('xmpp_providers_url');
+    const providers_url = api.settings.get('autocomplete_providers_url');
     if (!providers_url) {
         return [];
     }

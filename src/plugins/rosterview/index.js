@@ -4,7 +4,7 @@
  */
 import { _converse, api, converse, RosterFilter } from '@converse/headless';
 import RosterContactView from './contactview.js';
-import { highlightRosterItem } from './utils.js';
+import { clearXMPPProvidersCache, highlightRosterItem } from './utils.js';
 import '../modal';
 import AddContactModal from './modals/add-contact.js';
 import AcceptContactRequestModal from './modals/accept-contact-request.js';
@@ -25,8 +25,7 @@ converse.plugins.add('converse-rosterview', {
             hide_offline_users: false,
             roster_groups: true,
             xhr_user_search_url: null,
-            // XMPP Providers autocomplete settings
-            xmpp_providers_url: 'https://data.xmpp.net/providers/v2/providers-Ds.json',
+            autocomplete_providers_url: 'https://data.xmpp.net/providers/v2/providers-Ds.json',
         });
         api.promises.add('rosterViewInitialized');
 
@@ -43,6 +42,8 @@ converse.plugins.add('converse-rosterview', {
         Object.assign(_converse.exports, exports);
 
         /* -------- Event Handlers ----------- */
+        api.listen.on('change:autocomplete_providers_url', () => clearXMPPProvidersCache());
+
         api.listen.on('chatBoxesInitialized', () => {
             _converse.state.chatboxes.on('destroy', (c) => highlightRosterItem(c.get('jid')));
             _converse.state.chatboxes.on('change:hidden', (c) => highlightRosterItem(c.get('jid')));

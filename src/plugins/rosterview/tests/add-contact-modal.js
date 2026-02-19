@@ -115,7 +115,7 @@ describe("The 'Add Contact' widget", function () {
 
     it("shows XMPP provider suggestions when typing a JID",
             mock.initConverse([], {
-                xmpp_providers_url: 'https://data.xmpp.net/providers/v2/providers-Ds.json'
+                autocomplete_providers_url: 'https://data.xmpp.net/providers/v2/providers-Ds.json'
             }, async function (_converse) {
 
         // Mock the providers API response
@@ -152,14 +152,12 @@ describe("The 'Add Contact' widget", function () {
         const suggestions = Array.from(modal.querySelectorAll('.suggestion-box li'))
             .map(li => li.textContent.trim());
 
-        // Should show provider suggestions that start with 'jab'
-        expect(suggestions.some(s => s.includes('jabber.de'))).toBe(true);
-        expect(suggestions.some(s => s.includes('jabber.fr'))).toBe(true);
+        expect(suggestions.length).toBe(2);
+        expect(suggestions).toEqual(['testuser@jabber.de', 'testuser@jabber.fr']);
 
-        // Verify that selecting a suggestion works
-        const jabberDeSuggestion = modal.querySelector('.suggestion-box li');
-        const el = u.ancestor(jabberDeSuggestion, 'converse-autocomplete');
-        el.auto_complete.select(jabberDeSuggestion);
+        const jabber_de_suggestion = modal.querySelector('.suggestion-box li');
+        const el = u.ancestor(jabber_de_suggestion, 'converse-autocomplete');
+        el.auto_complete.select(jabber_de_suggestion);
 
         // Input should now have the full JID
         expect(input_jid.value).toMatch(/^testuser@jabber/);
@@ -167,7 +165,7 @@ describe("The 'Add Contact' widget", function () {
 
     it("falls back to roster domains when providers API is unavailable",
             mock.initConverse([], {
-                xmpp_providers_url: 'https://data.xmpp.net/providers/v2/providers-Ds.json'
+                autocomplete_providers_url: 'https://data.xmpp.net/providers/v2/providers-Ds.json'
             }, async function (_converse) {
 
         // Mock a failed providers API response
@@ -202,9 +200,9 @@ describe("The 'Add Contact' widget", function () {
         expect(suggestion.textContent.trim()).toBe('someone@montague.lit');
     }));
 
-    it("allows disabling provider autocomplete by setting xmpp_providers_url to empty",
+    it("allows disabling provider autocomplete by setting autocomplete_providers_url to empty",
             mock.initConverse([], {
-                xmpp_providers_url: ''
+                autocomplete_providers_url: ''
             }, async function (_converse) {
 
         // Track if providers URL was called
