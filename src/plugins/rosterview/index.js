@@ -42,7 +42,7 @@ converse.plugins.add('converse-rosterview', {
         Object.assign(_converse.exports, exports);
 
         /* -------- Event Handlers ----------- */
-        api.listen.on('change:autocomplete_providers_url', () => clearXMPPProvidersCache());
+        api.settings.listen.on('change:autocomplete_providers_url', () => clearXMPPProvidersCache());
 
         api.listen.on('chatBoxesInitialized', () => {
             _converse.state.chatboxes.on('destroy', (c) => highlightRosterItem(c.get('jid')));
