@@ -354,19 +354,15 @@ export function getJIDsAutoCompleteList() {
     ];
 }
 
-/** @type {string[] | null} */
-let xmpp_providers_cache = null;
-
 /** @type {Promise<string[]> | null} */
-let xmpp_providers_fetch_promise = null;
+let xmpp_providers_promise = null;
 
 /**
  * Clears the cached XMPP providers list.
  * Useful for testing or when the providers URL is changed.
  */
 export function clearXMPPProvidersCache() {
-    xmpp_providers_cache = null;
-    xmpp_providers_fetch_promise = null;
+    xmpp_providers_promise = null;
 }
 
 /**
@@ -375,13 +371,8 @@ export function clearXMPPProvidersCache() {
  * @returns {Promise<string[]>}
  */
 export async function fetchXMPPProviders() {
-    if (xmpp_providers_cache !== null) {
-        return xmpp_providers_cache;
-    }
-
-    // If a fetch is already in progress, wait for it
-    if (xmpp_providers_fetch_promise !== null) {
-        return xmpp_providers_fetch_promise;
+    if (xmpp_providers_promise !== null) {
+        return xmpp_providers_promise;
     }
 
     const providers_url = api.settings.get('autocomplete_providers_url');
@@ -389,7 +380,7 @@ export async function fetchXMPPProviders() {
         return [];
     }
 
-    xmpp_providers_fetch_promise = (async () => {
+    xmpp_providers_promise = (async () => {
         try {
             const response = await fetch(providers_url, {
                 mode: /** @type {RequestMode} */ ('cors'),
@@ -405,10 +396,8 @@ export async function fetchXMPPProviders() {
 
             const json = await response.json();
 
-            // The simple provider list (providers-Ds.json) returns an array of domain strings
             if (Array.isArray(json)) {
-                xmpp_providers_cache = json.filter((p) => typeof p === 'string');
-                return xmpp_providers_cache;
+                return json.filter((p) => typeof p === 'string');
             }
 
             log.error('Invalid XMPP providers response format');
@@ -417,12 +406,10 @@ export async function fetchXMPPProviders() {
             log.error('Failed to fetch XMPP providers');
             log.error(e);
             return [];
-        } finally {
-            xmpp_providers_fetch_promise = null;
         }
     })();
 
-    return xmpp_providers_fetch_promise;
+    return xmpp_providers_promise;
 }
 
 /**
